@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skim View — 要点語・随伴語 二列図示ツール（Android版）</title>
+<title>Skim View (流読表示) — Android</title>
 <style>
   :root{
     --paper:#F7F4EC;
@@ -52,8 +52,8 @@
     font-size:14px;
     color:var(--ink-soft);
     margin:0 0 30px;
+    font-family:"Georgia",serif;
   }
-  /* 実際のアプリと同一ロジックによる見出し部の二列表示（本物のデモ） */
   .demo table{
     width:100%;
     table-layout:fixed;
@@ -76,6 +76,36 @@
     color:var(--ink-soft);
     letter-spacing:0.06em;
     margin:8px 2px 0;
+    font-family:"Georgia",serif;
+  }
+
+  .lang-divider{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:56px 0 40px;
+  }
+  .lang-divider::before, .lang-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line-strong);
+  }
+  .lang-divider span{
+    font-family:"Georgia",serif;
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--accent);
+    white-space:nowrap;
+  }
+  .lang-eyebrow{
+    font-family:"Georgia",serif;
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 24px;
   }
 
   section{ margin-bottom:52px; }
@@ -264,9 +294,9 @@
 <div class="frame">
 
   <header class="hero">
-    <p class="kicker">Keyword / Satellite — Android Edition</p>
-    <h1>Skim View</h1>
-    <p class="sub">要点語・随伴語 二列図示ツール — 英文を「要点語」と「随伴語」の二列に分けて表示する、完全オフライン動作のAndroidアプリ</p>
+    <p class="kicker">Keyword / Skimmed Word — Android Edition</p>
+    <h1>Skim View <span style="font-weight:400;">(流読表示)</span></h1>
+    <p class="sub">Split English sentences into two columns — Keyword and Skimmed Word — with a fully offline Android app.</p>
 
     <div class="demo">
       <table>
@@ -276,19 +306,146 @@
         <tr><td class="keyword"></td><td class="satellite">into</td></tr>
         <tr><td class="keyword">keywords</td><td class="satellite"></td></tr>
         <tr><td class="keyword"></td><td class="satellite">and</td></tr>
-        <tr><td class="keyword">satellites</td><td class="satellite"></td></tr>
+        <tr><td class="keyword">skimmed words</td><td class="satellite"></td></tr>
       </table>
-      <p class="demo-caption">実際のアプリ内表示と同じ分類ロジックによる見本</p>
+      <p class="demo-caption">Sample output, using the same classification logic as the app</p>
     </div>
   </header>
 
-  <section id="about">
+  <!-- ============================= ENGLISH ============================= -->
+  <p class="lang-eyebrow">English</p>
+
+  <section id="about-en">
+    <h2>About</h2>
+    <p class="lead">Skim View splits pasted English text into two columns, line by line: <b>Keyword</b> (content words) and <b>Skimmed Word</b> (function words, and words too ambiguous for a program to classify reliably). It runs the same classification engine used in the browser extension and the HTML tool, ported here as a fully offline Android app.</p>
+    <p>Because everything runs entirely on the device, it works without an internet connection, and the text you paste is never sent anywhere.</p>
+  </section>
+
+  <section id="download-en">
+    <h2>Download</h2>
+    <div class="dl-card">
+      <div class="dl-meta">
+        <span>Version: <b>v1.0.0</b></span>
+        <span>Requires: <b>Android 7.0 (API 24) or later</b></span>
+        <span>Distribution: <b>APK (outside Google Play)</b></span>
+      </div>
+      <a class="dl-button" href="https://github.com/Tunbawang/skim-view-android/releases/download/v1.0.0/app-release.apk">Download app-release.apk</a>
+      <p class="dl-note">Open this page in your device's browser (e.g. Chrome). After downloading, follow the installation steps below.</p>
+    </div>
+  </section>
+
+  <section id="install-en">
+    <h2>Installation</h2>
+    <p>Because this app isn't distributed through Google Play, Android shows its standard unknown-source confirmation during installation. Follow the steps below (exact wording may vary by device and browser version).</p>
+    <ol class="steps">
+      <li>
+        <b>Download the APK file</b>
+        Tap "Download app-release.apk" above.
+      </li>
+      <li>
+        <b>Tap the download-complete notification</b>
+        <span class="note">If no notification appears, open app-release.apk from your file manager's Downloads folder.</span>
+      </li>
+      <li>
+        <b>An "Install unknown apps" screen appears</b>
+        A warning such as "Installing apps from this source isn't allowed" appears, along with a "Settings" button.
+      </li>
+      <li>
+        <b>Allow this source for your browser</b>
+        On the settings screen that opens, turn on "Allow from this source."
+      </li>
+      <li>
+        <b>Go back and install</b>
+        Tap "Install" to install the app as usual.
+      </li>
+    </ol>
+  </section>
+
+  <section id="usage-en">
+    <h2>How to Use</h2>
+    <p>Beyond opening Skim View directly and pasting text, you can select English text in any other app — a browser, e-book reader, PDF viewer, and so on — and call Skim View directly from there for a two-column split.</p>
+
+    <ol class="steps">
+      <li>
+        <b>Select the text you want to read</b>
+        Press and hold, then drag to select a range of text.
+      </li>
+      <li>
+        <b>Tap "⋮" on the selection toolbar</b>
+        <span class="note">Some devices won't let you screenshot the screen while text is selected, so a mockup of the flow is shown below.</span>
+
+        <div class="usage-mock">
+          <div class="mock-selection">
+            <span class="mock-highlight">The mysterious ship approached at dawn.</span>
+          </div>
+          <div class="mock-toolbar">
+            <span class="mock-btn">Copy</span>
+            <span class="mock-btn">Share</span>
+            <span class="mock-btn">Web search</span>
+            <span class="mock-btn mock-btn-more">⋮</span>
+          </div>
+          <p class="mock-caption">Selecting text shows this bar. Tap the "⋮" (three vertical dots) on the right end.</p>
+
+          <div class="mock-dropdown">
+            <div class="mock-row">Translate</div>
+            <div class="mock-row">Look up definition</div>
+            <div class="mock-ellipsis">⋯ scroll down ⋯</div>
+            <div class="mock-row mock-row-target">Skim View <span class="mock-tap">tap</span></div>
+          </div>
+          <p class="mock-caption">Tapping "⋮" opens a list of additional apps. Scroll down to find "Skim View" and tap it.</p>
+        </div>
+      </li>
+      <li>
+        <b>Scroll down through the list</b>
+        App order varies by device — keep scrolling if you don't see it right away.
+      </li>
+      <li>
+        <b>Tap "Skim View"</b>
+        The selected text is passed directly to Skim View, and the Keyword / Skimmed Word split happens automatically.
+      </li>
+    </ol>
+    <p class="dl-note">Toolbar appearance and icon order vary by device manufacturer and app. If you don't see "⋮", try swiping the toolbar left or right to reveal hidden items.</p>
+  </section>
+
+  <section id="permissions-en">
+    <h2>Permissions</h2>
+    <p>The "unknown app" confirmation above is an Android OS-level check on the distribution channel — not a permission for the app to access your personal data or device features. Skim View requests no permissions at all: no internet, no storage, no camera, no location.</p>
+    <table class="perm-table">
+      <tr><th>Permission</th><th>Requested</th></tr>
+      <tr><td>Internet access</td><td>Not requested (fully offline)</td></tr>
+      <tr><td>Storage / file access</td><td>Not requested</td></tr>
+      <tr><td>Camera, microphone, location, etc.</td><td>Not requested</td></tr>
+    </table>
+  </section>
+
+  <section id="faq-en">
+    <h2>FAQ</h2>
+    <details>
+      <summary>Why isn't this distributed through Google Play?</summary>
+      <p>This is an individually maintained reading tool, built on the idea that splitting text into Keyword and Skimmed Word columns makes skimming easier for anyone reading English — native speakers and language learners alike. It's currently distributed directly through GitHub together with its source code, so its behavior and classification logic are public and can be reviewed before installing.</p>
+    </details>
+    <details>
+      <summary>Is the "unknown app" warning safe?</summary>
+      <p>This is a standard Android OS mechanism shown for any app distributed outside Google Play. The warning itself says nothing about the app's safety — decide based on whether you trust the source (this page and repository).</p>
+    </details>
+    <details>
+      <summary>Can I turn this permission back off after installing?</summary>
+      <p>Yes. You can turn off "install unknown apps" for any browser at any time from the Settings app, under Apps or Security.</p>
+    </details>
+  </section>
+
+  <div class="lang-divider"><span>日本語 / Japanese</span></div>
+
+  <!-- ============================= 日本語 ============================= -->
+  <p class="lang-eyebrow">日本語</p>
+
+  <section id="about-ja">
     <h2>このアプリについて</h2>
-    <p class="lead">Skim Viewは、貼り付けた英文を1行ごとに「内容語（要点語）」と「機能語・多義的で判定困難な語（随伴語）」の二列に自動で振り分けて表示する読解支援ツールです。ブラウザ拡張版・HTML版と同一の分類エンジンを、通信不要のオフラインAndroidアプリとして移植しています。</p>
+    <p class="lead">Skim Viewは、貼り付けた英文を1行ごとに「<b>Keyword（要点語）</b>」と「<b>Skimmed Word（所流語）</b>」の二列に自動で振り分けて表示する読解支援ツールです。ブラウザ拡張版・HTML版と同一の分類エンジンを、通信不要のオフラインAndroidアプリとして移植しています。</p>
     <p>端末内で完結して動作するため、インターネット接続がない場所でも利用でき、入力した英文が外部に送信されることもありません。</p>
   </section>
 
-  <section id="download">
+  <section id="download-ja">
     <h2>ダウンロード</h2>
     <div class="dl-card">
       <div class="dl-meta">
@@ -301,7 +458,7 @@
     </div>
   </section>
 
-  <section id="install">
+  <section id="install-ja">
     <h2>インストール手順</h2>
     <p>Google Play を経由しない配布のため、インストール時にAndroidの標準的な確認画面が表示されます。以下の手順に沿って進めてください（表示文言は端末・ブラウザのバージョンにより多少異なります）。</p>
     <ol class="steps">
@@ -328,7 +485,7 @@
     </ol>
   </section>
 
-  <section id="usage">
+  <section id="usage-ja">
     <h2>使い方</h2>
     <p>Skim Viewを直接開いて英文を貼り付ける以外に、他のアプリ（ブラウザ・電子書籍・PDFなど）で英文を選択するだけで、その場からSkim Viewを呼び出して二列表示させることができます。</p>
 
@@ -368,13 +525,13 @@
       </li>
       <li>
         <b>「Skim View」をタップする</b>
-        選択していた英文がそのままSkim Viewに渡され、要点語・随伴語の二列表示が自動で行われます。
+        選択していた英文がそのままSkim Viewに渡され、Keyword（要点語）／Skimmed Word（所流語）の二列表示が自動で行われます。
       </li>
     </ol>
     <p class="dl-note">ツールバーの見た目・配置（アイコンの種類や順番）は端末メーカーやアプリごとに異なります。「⋮」が見当たらない場合は、ツールバーを左右にスワイプすると隠れている項目が現れることがあります。</p>
   </section>
 
-  <section id="permissions">
+  <section id="permissions-ja">
     <h2>アプリが要求する権限について</h2>
     <p>上記の「不明なアプリの許可」はAndroid OS側の配布経路に関する確認であり、アプリ自体が個人情報や端末機能へアクセスするための権限ではありません。Skim Viewはインターネット通信・ストレージ・カメラ・位置情報など、いずれの権限も要求しません。</p>
     <table class="perm-table">
@@ -385,11 +542,11 @@
     </table>
   </section>
 
-  <section id="faq">
+  <section id="faq-ja">
     <h2>よくある質問</h2>
     <details>
       <summary>なぜGoogle Playで配布していないのですか</summary>
-      <p>個人が公開している言語学習向けツールのため、まずはGitHub上でソースコードとともに直接配布しています。動作や分類ロジックはコードとして公開されており、内容を確認したうえでインストールいただけます。</p>
+      <p>個人が公開している読解支援ツールのため、まずはGitHub上でソースコードとともに直接配布しています。Keyword（要点語）とSkimmed Word（所流語）の二列に分けて表示することで、ネイティヴスピーカーであれ外国語学習者であれ、英語を読む人にとって流し読みがしやすくなるという考えに基づいています。動作や分類ロジックはコードとして公開されており、内容を確認したうえでインストールいただけます。</p>
     </details>
     <details>
       <summary>「提供元不明のアプリ」の警告は安全ですか</summary>
@@ -402,7 +559,7 @@
   </section>
 
   <footer>
-    ソースコード：<a href="https://github.com/Tunbawang/skim-view-android">github.com/Tunbawang/skim-view-android</a>
+    Source code / ソースコード：<a href="https://github.com/Tunbawang/skim-view-android">github.com/Tunbawang/skim-view-android</a>
   </footer>
 
 </div>
