@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skim View — 要点語・随伴語 二列図示ツール（Android版）</title>
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --ink:#2B2A28;
+    --ink-soft:#5A574D;
+    --accent:#2C5F6F;
+    --accent-soft:#6E96A2;
+    --line:#D9D3C4;
+    --line-strong:#B8AF98;
+    --paper-raised:#FFFEFA;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    line-height:1.85;
+  }
+  .frame{
+    max-width:720px;
+    margin:0 auto;
+    padding:56px 20px 100px;
+  }
+  header.hero{
+    border-bottom:1px solid var(--line-strong);
+    padding-bottom:34px;
+    margin-bottom:40px;
+  }
+  .kicker{
+    font-family:"Georgia",serif;
+    font-size:11px;
+    letter-spacing:0.22em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:30px;
+    font-weight:500;
+    letter-spacing:0.03em;
+    margin:0 0 6px;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:0 0 30px;
+  }
+  /* 実際のアプリと同一ロジックによる見出し部の二列表示（本物のデモ） */
+  .demo table{
+    width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+    font-family:"Georgia",serif;
+    font-size:15px;
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+  }
+  .demo td{
+    width:50%;
+    border:1px solid var(--line);
+    padding:6px 14px;
+    height:1.6em;
+  }
+  .demo td.keyword{ text-align:right; }
+  .demo td.satellite{ text-align:left; color:var(--accent); }
+  .demo-caption{
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:0.06em;
+    margin:8px 2px 0;
+  }
+
+  section{ margin-bottom:52px; }
+  h2{
+    font-size:17px;
+    font-weight:500;
+    letter-spacing:0.03em;
+    margin:0 0 16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  p{ margin:0 0 14px; font-size:15px; color:var(--ink); }
+  .lead{ font-size:15.5px; }
+
+  .dl-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    padding:26px 26px 24px;
+  }
+  .dl-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 22px;
+    font-family:"Georgia",serif;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .dl-meta span b{ color:var(--ink); font-weight:600; }
+  a.dl-button{
+    display:inline-block;
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    font-size:15px;
+    letter-spacing:0.05em;
+    padding:12px 30px;
+    background:var(--ink);
+    color:var(--paper);
+    text-decoration:none;
+    border-radius:2px;
+  }
+  a.dl-button:hover{ background:var(--accent); }
+  .dl-note{
+    margin-top:16px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  ol.steps{
+    list-style:none;
+    counter-reset:step;
+    margin:0;
+    padding:0;
+  }
+  ol.steps li{
+    counter-increment:step;
+    position:relative;
+    padding:0 0 22px 40px;
+    border-left:1px solid var(--line);
+    margin-left:8px;
+  }
+  ol.steps li:last-child{ border-left-color:transparent; padding-bottom:0; }
+  ol.steps li::before{
+    content:counter(step);
+    position:absolute;
+    left:-13px;
+    top:0;
+    width:22px;
+    height:22px;
+    line-height:22px;
+    text-align:center;
+    font-family:"Georgia",serif;
+    font-size:12px;
+    color:var(--paper);
+    background:var(--accent);
+    border-radius:50%;
+  }
+  ol.steps b{ display:block; margin-bottom:3px; font-weight:600; }
+  ol.steps span.note{ font-size:13px; color:var(--ink-soft); }
+
+  .usage-mock{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    padding:20px 20px 4px;
+    margin-bottom:18px;
+  }
+  .mock-selection{
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:10px 12px;
+    margin-bottom:14px;
+    font-family:"Georgia",serif;
+    font-size:14px;
+  }
+  .mock-highlight{
+    background:rgba(44,95,111,0.16);
+    padding:1px 3px;
+  }
+  .mock-toolbar{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .mock-btn{
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    font-size:12px;
+    letter-spacing:0.02em;
+    padding:7px 12px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:2px;
+  }
+  .mock-btn-more{ background:var(--accent); font-weight:700; }
+  .mock-caption{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:0 0 22px;
+  }
+  .mock-dropdown{
+    border:1px solid var(--line-strong);
+    background:var(--paper);
+    margin-bottom:6px;
+  }
+  .mock-row{
+    padding:9px 14px;
+    font-size:13px;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+  }
+  .mock-row:last-child{ border-bottom:none; }
+  .mock-ellipsis{
+    text-align:center;
+    letter-spacing:3px;
+    color:var(--line-strong);
+    padding:4px 14px;
+  }
+  .mock-row-target{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:var(--ink);
+    font-weight:600;
+    background:rgba(44,95,111,0.08);
+  }
+  .mock-tap{
+    font-family:"Georgia",serif;
+    font-size:10.5px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    padding:2px 9px;
+    border-radius:20px;
+    letter-spacing:0.05em;
+  }
+
+  .perm-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .perm-table th, .perm-table td{
+    text-align:left;
+    padding:9px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  .perm-table th{ color:var(--ink-soft); font-weight:500; font-size:12px; letter-spacing:0.04em; }
+
+  details{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    padding:14px 18px;
+    margin-bottom:10px;
+  }
+  details summary{
+    cursor:pointer;
+    font-weight:600;
+    font-size:14.5px;
+  }
+  details p{ margin-top:12px; font-size:14px; }
+
+  footer{
+    border-top:1px solid var(--line-strong);
+    padding-top:24px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  footer a{ color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <header class="hero">
+    <p class="kicker">Keyword / Satellite — Android Edition</p>
+    <h1>Skim View</h1>
+    <p class="sub">要点語・随伴語 二列図示ツール — 英文を「要点語」と「随伴語」の二列に分けて表示する、完全オフライン動作のAndroidアプリ</p>
+
+    <div class="demo">
+      <table>
+        <tr><td class="keyword">This app</td><td class="satellite"></td></tr>
+        <tr><td class="keyword">splits</td><td class="satellite"></td></tr>
+        <tr><td class="keyword">sentences</td><td class="satellite"></td></tr>
+        <tr><td class="keyword"></td><td class="satellite">into</td></tr>
+        <tr><td class="keyword">keywords</td><td class="satellite"></td></tr>
+        <tr><td class="keyword"></td><td class="satellite">and</td></tr>
+        <tr><td class="keyword">satellites</td><td class="satellite"></td></tr>
+      </table>
+      <p class="demo-caption">実際のアプリ内表示と同じ分類ロジックによる見本</p>
+    </div>
+  </header>
+
+  <section id="about">
+    <h2>このアプリについて</h2>
+    <p class="lead">Skim Viewは、貼り付けた英文を1行ごとに「内容語（要点語）」と「機能語・多義的で判定困難な語（随伴語）」の二列に自動で振り分けて表示する読解支援ツールです。ブラウザ拡張版・HTML版と同一の分類エンジンを、通信不要のオフラインAndroidアプリとして移植しています。</p>
+    <p>端末内で完結して動作するため、インターネット接続がない場所でも利用でき、入力した英文が外部に送信されることもありません。</p>
+  </section>
+
+  <section id="download">
+    <h2>ダウンロード</h2>
+    <div class="dl-card">
+      <div class="dl-meta">
+        <span>バージョン：<b>v1.0.0</b></span>
+        <span>対応OS：<b>Android 7.0（API 24）以上</b></span>
+        <span>配布形式：<b>APK（Google Play外）</b></span>
+      </div>
+      <a class="dl-button" href="https://github.com/Tunbawang/skim-view-android/releases/download/v1.0.0/app-release.apk">app-release.apk をダウンロード</a>
+      <p class="dl-note">端末のAndroid標準ブラウザ（Chromeなど）で開いてください。ダウンロード後、下記の手順に沿ってインストールを行ってください。</p>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>インストール手順</h2>
+    <p>Google Play を経由しない配布のため、インストール時にAndroidの標準的な確認画面が表示されます。以下の手順に沿って進めてください（表示文言は端末・ブラウザのバージョンにより多少異なります）。</p>
+    <ol class="steps">
+      <li>
+        <b>APKファイルをダウンロードする</b>
+        上の「app-release.apk をダウンロード」をタップします。
+      </li>
+      <li>
+        <b>ダウンロード完了の通知をタップする</b>
+        <span class="note">通知が表示されない場合は、ファイル管理アプリの「ダウンロード」フォルダから app-release.apk を開いてください。</span>
+      </li>
+      <li>
+        <b>「不明なアプリのインストール」の確認画面が出る</b>
+        「このソースからのアプリのインストールは許可されていません」等の警告とともに、「設定」ボタンが表示されます。
+      </li>
+      <li>
+        <b>ブラウザに対してインストール許可をオンにする</b>
+        遷移先の設定画面で「このソースを許可」（英語表記では Allow from this source）のスイッチをオンにします。
+      </li>
+      <li>
+        <b>前の画面に戻り、インストールを実行する</b>
+        「インストール」ボタンをタップすると、通常どおりアプリが端末に導入されます。
+      </li>
+    </ol>
+  </section>
+
+  <section id="usage">
+    <h2>使い方</h2>
+    <p>Skim Viewを直接開いて英文を貼り付ける以外に、他のアプリ（ブラウザ・電子書籍・PDFなど）で英文を選択するだけで、その場からSkim Viewを呼び出して二列表示させることができます。</p>
+
+    <ol class="steps">
+      <li>
+        <b>読みたい英文を選択する</b>
+        ブラウザや読書アプリなどで、対象の英文を長押ししてドラッグし、範囲を選択します。
+      </li>
+      <li>
+        <b>選択ツールバーの「⋮」をタップする</b>
+        <span class="note">文字を選択した状態の画面は端末によってはスクリーンショットが撮れないため、下に操作の見取り図を示します。</span>
+
+        <div class="usage-mock">
+          <div class="mock-selection">
+            <span class="mock-highlight">The mysterious ship approached at dawn.</span>
+          </div>
+          <div class="mock-toolbar">
+            <span class="mock-btn">コピー</span>
+            <span class="mock-btn">共有</span>
+            <span class="mock-btn">Web検索</span>
+            <span class="mock-btn mock-btn-more">⋮</span>
+          </div>
+          <p class="mock-caption">文章を選択すると、この帯（選択ツールバー）が画面上に表示されます。右端の「⋮」（縦に並んだ三つの点）をタップします。</p>
+
+          <div class="mock-dropdown">
+            <div class="mock-row">翻訳</div>
+            <div class="mock-row">定義を検索</div>
+            <div class="mock-ellipsis">⋯ 下へスクロール ⋯</div>
+            <div class="mock-row mock-row-target">Skim View <span class="mock-tap">タップ</span></div>
+          </div>
+          <p class="mock-caption">「⋮」をタップすると追加のアプリ一覧が開きます。一覧を下までスクロールすると「Skim View」が見つかりますので、それをタップします。</p>
+        </div>
+      </li>
+      <li>
+        <b>一覧を下までスクロールする</b>
+        アプリの並び順は端末によって異なるため、見当たらない場合は一覧の下方まで確認してください。
+      </li>
+      <li>
+        <b>「Skim View」をタップする</b>
+        選択していた英文がそのままSkim Viewに渡され、要点語・随伴語の二列表示が自動で行われます。
+      </li>
+    </ol>
+    <p class="dl-note">ツールバーの見た目・配置（アイコンの種類や順番）は端末メーカーやアプリごとに異なります。「⋮」が見当たらない場合は、ツールバーを左右にスワイプすると隠れている項目が現れることがあります。</p>
+  </section>
+
+  <section id="permissions">
+    <h2>アプリが要求する権限について</h2>
+    <p>上記の「不明なアプリの許可」はAndroid OS側の配布経路に関する確認であり、アプリ自体が個人情報や端末機能へアクセスするための権限ではありません。Skim Viewはインターネット通信・ストレージ・カメラ・位置情報など、いずれの権限も要求しません。</p>
+    <table class="perm-table">
+      <tr><th>権限</th><th>要求の有無</th></tr>
+      <tr><td>インターネット通信</td><td>要求なし（完全オフライン動作）</td></tr>
+      <tr><td>ストレージ／ファイルアクセス</td><td>要求なし</td></tr>
+      <tr><td>カメラ・マイク・位置情報等</td><td>要求なし</td></tr>
+    </table>
+  </section>
+
+  <section id="faq">
+    <h2>よくある質問</h2>
+    <details>
+      <summary>なぜGoogle Playで配布していないのですか</summary>
+      <p>個人が公開している言語学習向けツールのため、まずはGitHub上でソースコードとともに直接配布しています。動作や分類ロジックはコードとして公開されており、内容を確認したうえでインストールいただけます。</p>
+    </details>
+    <details>
+      <summary>「提供元不明のアプリ」の警告は安全ですか</summary>
+      <p>この警告は、Google Play以外の経路で配布されるすべてのAndroidアプリに共通して表示されるOS標準の仕組みです。警告自体はアプリの安全性を示すものではないため、配布元（本ページ・本リポジトリ）を信頼できるかどうかで判断してください。</p>
+    </details>
+    <details>
+      <summary>インストール後、この許可設定は元に戻せますか</summary>
+      <p>はい。設定アプリの「アプリ」または「セキュリティ」内から、ブラウザごとの「不明なアプリのインストール」許可はいつでもオフに戻せます。</p>
+    </details>
+  </section>
+
+  <footer>
+    ソースコード：<a href="https://github.com/Tunbawang/skim-view-android">github.com/Tunbawang/skim-view-android</a>
+  </footer>
+
+</div>
+</body>
+</html>
