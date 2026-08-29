@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skim View — Keyword / Skimmed Word Split Viewer ／ 要点語・所流語 二列表示</title>
-<script src="compromise.js"></script>
+<title>Skim View (流読表示) — Android</title>
 <style>
   :root{
     --paper:#F7F4EC;
@@ -22,364 +21,203 @@
     color:var(--ink);
     font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
     padding:32px 16px 80px;
+    max-width:760px;
+    margin:0 auto;
+    line-height:1.7;
   }
   h1{
-    font-size:22px;
+    font-size:24px;
     font-weight:500;
-    letter-spacing:0.04em;
     margin:0 0 4px;
     border-bottom:1px solid var(--line-strong);
     padding-bottom:14px;
   }
-  .sub{ display:none; }
-  textarea{
-    width:100%;
-    min-height:120px;
-    font-family:"Georgia",serif;
-    font-size:15px;
-    line-height:1.6;
-    padding:14px;
-    background:#FFFEFA;
-    border:1px solid var(--line-strong);
-    border-radius:2px;
-    color:var(--ink);
-    resize:vertical;
-  }
-  textarea:focus{
-    outline:none;
-    border-color:var(--accent);
-  }
-  .controls{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-top:14px;
-    flex-wrap:wrap;
-  }
-  button{
-    font-family:inherit;
-    font-size:14px;
-    letter-spacing:0.05em;
-    padding:9px 26px;
-    background:var(--ink);
-    color:var(--paper);
-    border:none;
-    border-radius:2px;
-    cursor:pointer;
-  }
-  button:hover{ background:var(--accent); }
-  label.opt{
-    font-size:12px;
-    color:var(--ink-soft);
-    display:flex;
-    align-items:center;
-    gap:6px;
-    cursor:pointer;
-  }
-  .font-controls{
-    display:flex;
-    align-items:center;
-    gap:4px;
-    margin-left:auto;
-  }
-  .font-btn{
-    font-family:inherit;
-    font-size:12px;
-    letter-spacing:0;
-    padding:6px 12px;
-    background:#FFFEFA;
-    color:var(--ink);
-    border:1px solid var(--line-strong);
-    border-radius:2px;
-  }
-  .font-btn:hover{ background:var(--paper); }
-  .paragraphs{
+  h2{
+    font-size:18px;
     margin-top:36px;
-    display:flex;
-    flex-direction:column;
-    gap:32px;
-  }
-  .para-label{
-    font-size:11px;
-    color:var(--ink-soft);
-    letter-spacing:0.08em;
-    margin-bottom:6px;
-  }
-  table{
-    width:100%;
-    table-layout:fixed;
-    border-collapse:collapse;
-    font-family:"Georgia",serif;
-    font-size:15px;
-  }
-  td{
-    width:50%;
-    border:1px solid var(--line);
-    padding:5px 14px;
-    height:1.6em;
-    overflow-wrap:break-word;
-  }
-  td.keyword{ text-align:right; }
-  td.satellite{
-    text-align:left;
     color:var(--accent);
   }
-  .empty-note{
+  h3{ font-size:15px; margin-bottom:4px; }
+  a{ color:var(--accent); }
+  .tagline{ color:var(--ink-soft); font-size:15px; }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+    margin:12px 0;
+  }
+  td, th{
+    border:1px solid var(--line);
+    padding:6px 12px;
+    text-align:left;
+  }
+  .sample td{ text-align:right; }
+  .sample td.satellite{ text-align:left; color:var(--accent); }
+  .dl-box{
+    background:#FFFEFA;
+    border:1px solid var(--line-strong);
+    border-radius:4px;
+    padding:18px;
+    margin:16px 0;
+  }
+  .dl-box a.button{
+    display:inline-block;
+    margin-top:8px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:10px 24px;
+    border-radius:2px;
+    text-decoration:none;
+  }
+  .dl-box a.button:hover{ background:var(--accent); }
+  .lang-tab{
+    display:flex;
+    gap:0;
+    margin-top:24px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  .lang-tab button{
+    font-family:inherit;
+    font-size:14px;
+    padding:10px 20px;
+    background:none;
+    border:none;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .lang-tab button.active{
+    color:var(--ink);
+    border-bottom-color:var(--accent);
+  }
+  .lang-panel{ display:none; }
+  .lang-panel.active{ display:block; }
+  footer{
+    margin-top:48px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
     font-size:13px;
     color:var(--ink-soft);
-    padding:20px 0;
   }
-  .frame{
-    position:relative;
-    max-width:760px;
-    width:100%;
-    margin:0 auto;
-    padding-right:14px;
-  }
-  .frame-edge{
-    position:absolute;
-    top:0;
-    right:0;
-    width:14px;
-    bottom:0;
-    cursor:ew-resize;
-  }
-  .frame-edge::after{
-    content:"";
-    position:absolute;
-    top:0;
-    right:5px;
-    width:4px;
-    height:100%;
-    background:var(--line-strong);
-    border-radius:2px;
-  }
-  .frame-edge:hover::after{ background:var(--accent); }
 </style>
 </head>
 <body>
-<div class="frame" id="frame">
-  <h1>Skim View <span style="font-weight:400;font-size:14px;color:var(--ink-soft);">— Keyword / Skimmed Word Split Viewer ／ 要点語・所流語 二列表示</span></h1>
 
-  <textarea id="input" placeholder="Paste English text here (multiple paragraphs allowed) ／ ここに英文を貼り付けてください(複数段落可)">The year 1866 was signalised by a remarkable incident, a mysterious and puzzling phenomenon, which doubtless no one has yet forgotten.</textarea>
+<h1>Skim View (流読表示)</h1>
+<p class="tagline">Split English sentences into two columns — Keyword and Skimmed Word — with a fully offline Android app.</p>
 
-  <div class="controls">
-    <button id="run">Split ／ 図示</button>
-    <label class="opt"><input type="checkbox" id="resetOnSentence" checked> Reset line at sentence end (.?!) ／ 文末(.?!)で行をリセット</label>
-    <div class="font-controls">
-      <button class="font-btn" id="fontMinus" title="Decrease font size ／ 文字を小さく">A-</button>
-      <button class="font-btn" id="fontPlus" title="Increase font size ／ 文字を大きく">A+</button>
-    </div>
-  </div>
+<table class="sample">
+  <tr><td></td><td class="satellite">This</td></tr>
+  <tr><td>app</td><td class="satellite"></td></tr>
+  <tr><td>splits</td><td class="satellite"></td></tr>
+  <tr><td>sentences</td><td class="satellite">into</td></tr>
+  <tr><td>keywords</td><td class="satellite">and</td></tr>
+  <tr><td>skimmed</td><td class="satellite"></td></tr>
+  <tr><td>words.</td><td class="satellite"></td></tr>
+</table>
+<p style="font-size:13px;color:var(--ink-soft);">Actual output from the app's classification engine</p>
 
-  <div id="output" class="paragraphs"></div>
-  <div class="frame-edge" id="frameEdge" title="Drag to resize width ／ ドラッグで幅を変更"></div>
+<div class="lang-tab">
+  <button class="active" data-lang="en">English</button>
+  <button data-lang="ja">日本語</button>
 </div>
 
+<div id="panel-en" class="lang-panel active">
+  <h2>About</h2>
+  <p>Skim View splits pasted English text into two columns, line by line: <strong>Keyword</strong> and <strong>Skimmed Word</strong>. This split doesn't come from the classic content-word / function-word distinction, or from part-of-speech theory — it comes from a simpler, independent observation: when skimming a sentence, a reader's eyes mainly settle on certain words and glide past the rest. Keyword marks what a fast reader's eyes tend to settle on; Skimmed Word marks what gets glided past. It runs the same classification engine used in the browser extension and the HTML tool, ported here as a fully offline Android app.</p>
+  <p>Because everything runs entirely on the device, it works without an internet connection, and the text you paste is never sent anywhere.</p>
+
+  <h2>Download</h2>
+  <div class="dl-box">
+    <p>Version: <strong>v1.0.0</strong><br>Requires: <strong>Android 7.0 (API 24) or later</strong><br>Distribution: <strong>APK (outside Google Play)</strong></p>
+    <a class="button" href="https://github.com/Tunbawang/skim-view-android/releases/download/v1.0.0/app-release.apk">Download app-release.apk</a>
+    <p style="font-size:13px;margin-top:10px;">Open this page in your device's browser (e.g. Chrome). After downloading, follow the installation steps below.</p>
+  </div>
+
+  <h2>Installation</h2>
+  <p>Because this app isn't distributed through Google Play, Android shows its standard unknown-source confirmation during installation.</p>
+  <ol>
+    <li><strong>Download the APK file</strong> — Tap "Download app-release.apk" above.</li>
+    <li><strong>Tap the download-complete notification</strong> — If no notification appears, open app-release.apk from your file manager's Downloads folder.</li>
+    <li><strong>An "Install unknown apps" screen appears</strong> — A warning such as "Installing apps from this source isn't allowed" appears, along with a "Settings" button.</li>
+    <li><strong>Allow this source for your browser</strong> — On the settings screen that opens, turn on "Allow from this source."</li>
+    <li><strong>Go back and install</strong> — Tap "Install" to install the app as usual.</li>
+  </ol>
+
+  <h2>How to Use</h2>
+  <p>Beyond opening Skim View directly and pasting text, you can select English text in any other app and call Skim View directly from there for a two-column split.</p>
+  <ol>
+    <li><strong>Select the text you want to read</strong> — Press and hold, then drag to select a range of text.</li>
+    <li><strong>Tap "⋮" on the selection toolbar</strong></li>
+    <li><strong>Scroll down through the list</strong> — App order varies by device.</li>
+    <li><strong>Tap "Skim View"</strong> — The selected text is passed directly to Skim View, and the split happens automatically.</li>
+  </ol>
+
+  <h2>Permissions</h2>
+  <table>
+    <tr><th>Permission</th><th>Requested</th></tr>
+    <tr><td>Internet access</td><td>Not requested (fully offline)</td></tr>
+    <tr><td>Storage / file access</td><td>Not requested</td></tr>
+    <tr><td>Camera, microphone, location, etc.</td><td>Not requested</td></tr>
+  </table>
+
+  <h2>FAQ</h2>
+  <h3>Why isn't this distributed through Google Play?</h3>
+  <p>This is an individually maintained reading tool, distributed directly through GitHub together with its source code, so its behavior and classification logic are public and can be reviewed before installing.</p>
+  <h3>Is the "unknown app" warning safe?</h3>
+  <p>This is a standard Android OS mechanism shown for any app distributed outside Google Play. Decide based on whether you trust the source (this page and repository).</p>
+  <h3>Can I turn this permission back off after installing?</h3>
+  <p>Yes, any time from the Settings app, under Apps or Security.</p>
+</div>
+
+<div id="panel-ja" class="lang-panel">
+  <h2>このアプリについて</h2>
+  <p>Skim Viewは、貼り付けた英文を1行ごとに「<strong>Keyword（要点語）</strong>」と「<strong>Skimmed Word（所流語）</strong>」の二列に自動で振り分けて表示する読解支援ツールです。ブラウザ拡張版・HTML版と同一の分類エンジンを、通信不要のオフラインAndroidアプリとして移植しています。</p>
+  <p>端末内で完結して動作するため、インターネット接続がない場所でも利用でき、入力した英文が外部に送信されることもありません。</p>
+
+  <h2>ダウンロード</h2>
+  <div class="dl-box">
+    <p>バージョン：<strong>v1.0.0</strong><br>対応OS：<strong>Android 7.0（API 24）以上</strong><br>配布形式：<strong>APK（Google Play外）</strong></p>
+    <a class="button" href="https://github.com/Tunbawang/skim-view-android/releases/download/v1.0.0/app-release.apk">app-release.apk をダウンロード</a>
+  </div>
+
+  <h2>インストール手順</h2>
+  <ol>
+    <li>「app-release.apk をダウンロード」をタップします。</li>
+    <li>ダウンロード完了の通知をタップします。</li>
+    <li>「不明なアプリのインストール」の確認画面が出ます。</li>
+    <li>「このソースを許可」をオンにします。</li>
+    <li>「インストール」をタップします。</li>
+  </ol>
+
+  <h2>権限について</h2>
+  <table>
+    <tr><th>権限</th><th>要求の有無</th></tr>
+    <tr><td>インターネット通信</td><td>要求なし（完全オフライン動作）</td></tr>
+    <tr><td>ストレージ／ファイルアクセス</td><td>要求なし</td></tr>
+    <tr><td>カメラ・マイク・位置情報等</td><td>要求なし</td></tr>
+  </table>
+
+  <h2>よくある質問</h2>
+  <h3>なぜGoogle Playで配布していないのですか</h3>
+  <p>個人が公開している読解支援ツールのため、GitHub上でソースコードとともに直接配布しています。</p>
+  <h3>「提供元不明のアプリ」の警告は安全ですか</h3>
+  <p>Google Play以外の経路で配布されるすべてのAndroidアプリに共通して表示されるOS標準の仕組みです。</p>
+</div>
+
+<footer>
+  Source code / ソースコード：<a href="https://github.com/Tunbawang/skim-view-android">github.com/Tunbawang/skim-view-android</a>
+</footer>
+
 <script>
-// 随伴語として強制分類する語(compromiseのタグに関わらず優先)
-// v8: 接続副詞(therefore, however等)を明示的に追加。
-//     従来はcompromiseのConjunctionタグに依存しており、
-//     ライブラリのタグ付けが変わった場合に分類が崩れる余地があったため、
-//     再現性を優先しリストへ直接登録する形に変更した。
-const SATELLITE_OVERRIDE = new Set([
-  "there","here","now","then","why","where","when","how","since","while","although",
-  "though","whereas","notwithstanding","including","despite","per","via",
-  "upon","onto","off","out","up","down","away","back","forward",
-  "all","no","any","some","each","every","both","none","either","neither",
-  // 接続副詞(独立した語彙的意味を持つが、and/butと同じ統語的機能を担う閉じたクラスとして一貫して随伴語側に分類する)
-  "therefore","however","moreover","nevertheless","consequently",
-  "furthermore","thus","hence","otherwise",
-  // do/have の本動詞・助動詞論争に立ち入らず、用法を問わず一貫して随伴語側に分類する
-  "do","does","did","have","has","had",
-  // v10で追加: go/like/further/still/forward は用法によって働きが割れる語
-  // (本動詞/前置詞、副詞/接続副詞、副詞/形容詞など)だが、be/have/doと同じ理由で
-  // 文脈判定はせず一律で随伴語側に固定する。あわせてKEYWORD_OVERRIDEから
-  // further/stillを削除(旧: 要点語固定と非対称だった)。goはcompromiseのタグに
-  // 頼らずここで明示固定(likeのPreposition誤タグ問題と同様、タグ任せは不安定なため)。
-  "go","goes","going","went","gone",
-  "like","likes","liked","liking",
-  "further","still",
-  // 複合語のうち、分解した構成要素がどちらも随伴語(例: some+what, some+how, any+where)である場合は
-  // 全体を随伴語側とする。v9で追加: someone/somebody/something系(要点語部品one/body/thingを含むため
-  // KEYWORD_OVERRIDE側)と対になる規則が未実装で、"somewhat"等がcompromiseのAdverbタグにより
-  // 既定の要点語側へ誤って分類されていた(拡張機能版v1.4.1と同一の不具合)。
-  "somewhat","somehow","somewhere","anywhere","everywhere","nowhere",
-  // v12で追加: who/whom/whose/which/what は関係詞・疑問詞としての用法が
-  // compromise上でQuestionWord/Preposition/Determinerのいずれにも揺れて
-  // 出現し(同一語・同一品詞機能でも文脈によりタグが一致しない)、特にQuestionWord
-  // タグはSATELLITE_TAGSに含まれないため要点語側へ誤って抜け落ちる余地があった
-  // (今回の"which"の誤配置はこれが原因)。go/likeと同じ理由でタグ任せをやめ、
-  // 拡張機能版のSATELLITE_WORDSと揃える形で一律随伴語側に固定する。
-  "who","whom","whose","which","what",
-  // v13で追加: "at least"のような決まり文句の中でのみ、compromiseが"at"に
-  // 通常のPrepositionではなくAdverbタグを付けることがあり、SATELLITE_TAGSに
-  // 含まれないため要点語側へ誤って抜け落ちる余地があった。who/which等と同じ理由で
-  // タグ任せをやめ、拡張機能版のSATELLITE_WORDSと揃える形で一律随伴語側に固定する。
-  "at"
-]);
-
-// 要点語として強制分類する語(数量形容詞・比較級など、compromiseがDeterminer扱いしがちな語)
-const KEYWORD_OVERRIDE = new Set([
-  "more","most","many","much","few","fewer","several","less","least","enough",
-  "first","second","third","also","just","only","really",
-  "very","quite","rather","so","particularly",
-  // someone/anyone/everyone/no one 等の複合不定代名詞は、既知の指示対象を指すだけの
-  // 純代名詞(he, it, theyなど)とは異なり、新規の指示対象を導入する名詞句そのものであるため
-  // 要点語側とする。"no one"は正書法上2語なので分割され、no(随伴語)/one(要点語・数詞のデフォルト)
-  // として自動的に処理されるため、ここには含めない。
-  "someone","anyone","everyone","somebody","anybody","everybody",
-  "something","anything","everything","nothing"
-]);
-
-// 随伴語とみなす compromise の品詞タグ
-const SATELLITE_TAGS = new Set([
-  "Determiner","Preposition","Conjunction","Pronoun","Copula","Modal",
-  "Auxiliary","Negative"
-]);
-
-function classify(term){
-  const w = term.text.toLowerCase();
-  if (SATELLITE_OVERRIDE.has(w)) return "satellite";
-  if (KEYWORD_OVERRIDE.has(w)) return "keyword";
-  const tags = term.tags || [];
-  for (const t of tags){
-    if (SATELLITE_TAGS.has(t)) return "satellite";
-  }
-  return "keyword";
-}
-
-function buildRows(terms, resetOnSentence){
-  const rows = [];
-  let current = null;
-
-  terms.forEach((term, idx) => {
-    const display = ((term.pre||"").trim()) + term.text + ((term.post||"").trim());
-    if (display.trim() === "") return; // 短縮形展開などで生じる空トークンは無視する
-    const type = classify(term);
-
-    if (type === "keyword"){
-      current = { left: display, right: "" };
-      rows.push(current);
-    } else {
-      if (current && current.right === ""){
-        current.right = display;
-      } else {
-        current = { left: "", right: display };
-        rows.push(current);
-      }
-    }
-
-    if (resetOnSentence && /[.?!]["')]*$/.test(display)){
-      current = null;
-    }
+document.querySelectorAll(".lang-tab button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-tab button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".lang-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-" + btn.dataset.lang).classList.add("active");
   });
-
-  return rows;
-}
-
-function renderParagraph(text, resetOnSentence){
-  const doc = nlp(text);
-  const json = doc.json();
-  let terms = [];
-  json.forEach(sentence => { terms = terms.concat(sentence.terms); });
-
-  if (terms.length === 0) return null;
-
-  const rows = buildRows(terms, resetOnSentence);
-
-  let html = "<table><tbody>";
-  rows.forEach(r => {
-    html += "<tr>";
-    html += `<td class="keyword">${r.left ? escapeHtml(r.left) : ""}</td>`;
-    html += `<td class="satellite">${r.right ? escapeHtml(r.right) : ""}</td>`;
-    html += "</tr>";
-  });
-  html += "</tbody></table>";
-  return html;
-}
-
-function escapeHtml(s){
-  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-const FONT_SIZES = [11, 13, 15, 18, 21, 25, 30, 36, 44];
-let fontSizeIndex = 2; // 15px を初期値とする
-
-function applyFontSize(){
-  document.querySelectorAll("#output table").forEach(t => {
-    t.style.fontSize = FONT_SIZES[fontSizeIndex] + "px";
-  });
-}
-
-document.getElementById("fontMinus").addEventListener("click", () => {
-  fontSizeIndex = Math.max(0, fontSizeIndex - 1);
-  applyFontSize();
 });
-document.getElementById("fontPlus").addEventListener("click", () => {
-  fontSizeIndex = Math.min(FONT_SIZES.length - 1, fontSizeIndex + 1);
-  applyFontSize();
-});
-
-// 外枠(.frame)の右端ドラッグで幅を変更する。エクステンション版のパネル端リサイズと同じ操作感。
-(function setupFrameResize(){
-  const frame = document.getElementById("frame");
-  const edge = document.getElementById("frameEdge");
-  const minW = 380;
-
-  edge.addEventListener("mousedown", (e) => {
-    const startX = e.clientX;
-    const startW = frame.getBoundingClientRect().width;
-
-    function onMove(ev){
-      const dx = ev.clientX - startX;
-      const maxW = window.innerWidth - 32;
-      const newW = Math.max(minW, Math.min(startW + dx, maxW));
-      frame.style.maxWidth = newW + "px";
-    }
-    function onUp(){
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseup", onUp);
-    }
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
-    e.preventDefault();
-  });
-})();
-
-function run(){
-  if (typeof nlp === "undefined"){
-    document.getElementById("output").innerHTML =
-      '<div class="empty-note">Failed to load the language-processing library (compromise.js). Please check your internet connection and reload the page. ／ 言語処理ライブラリ(compromise.js)の読み込みに失敗しました。インターネット接続を確認し、ページを再読み込みしてください。</div>';
-    return;
-  }
-  const raw = document.getElementById("input").value;
-  const resetOnSentence = document.getElementById("resetOnSentence").checked;
-  const paragraphs = raw.split(/\n+/).map(p => p.trim()).filter(p => p.length > 0);
-  const output = document.getElementById("output");
-  output.innerHTML = "";
-
-  if (paragraphs.length === 0){
-    output.innerHTML = '<div class="empty-note">Please enter some English text. ／ 英文を入力してください。</div>';
-    return;
-  }
-
-  try {
-    paragraphs.forEach((para, i) => {
-      const tableHtml = renderParagraph(para, resetOnSentence);
-      if (!tableHtml) return;
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = `<div class="para-label">Paragraph ${i+1} ／ 段落${i+1}</div>${tableHtml}`;
-      output.appendChild(wrapper);
-    });
-    applyFontSize();
-  } catch (e) {
-    output.innerHTML = '<div class="empty-note">An error occurred ／ エラーが発生しました: ' + escapeHtml(String(e.message || e)) + '</div>';
-  }
-}
-
-document.getElementById("run").addEventListener("click", run);
-window.addEventListener("load", run);
 </script>
 </body>
 </html>
