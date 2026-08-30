@@ -38,3 +38,10 @@ jobs:
         with:
           name: app-release
           path: build-src/app/build/outputs/apk/release/*.apk
+      - name: Attach APK to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build-src/app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
