@@ -1,4 +1,5 @@
 name: Build APK
+
 permissions:
   contents: write
 
@@ -31,15 +32,32 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x build-src/gradlew
 
+      - name: Decode keystore
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+            echo "KEYSTORE_FILE=$(pwd)/release.keystore" >> "$GITHUB_ENV"
+            echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> "$GITHUB_ENV"
+          else
+            echo "KEYSTORE_BASE64 not set — building unsigned APK"
+          fi
+
       - name: Build release APK
         working-directory: build-src
         run: ./gradlew assembleRelease --no-daemon
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f release.keystore
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: build-src/app/build/outputs/apk/release/*.apk
+
       - name: Attach APK to GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
