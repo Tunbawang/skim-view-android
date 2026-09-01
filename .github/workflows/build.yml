@@ -26,8 +26,7 @@ jobs:
 
       - name: Extract project zip
         run: |
-          ZIP_FILE=$(ls skim-view-android-repo-root*.zip | head -n1)
-          unzip -o "$ZIP_FILE" -d build-src
+          unzip -o skimview-src.zip -d build-src
 
       - name: Grant execute permission for gradlew
         run: chmod +x build-src/gradlew
